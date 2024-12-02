@@ -7,4 +7,28 @@
   .navbar .text-white {
     font-weight: 500;
   }
+
+  #home {
+    width: 100%; /* Garantir que a largura ocupe toda a tela */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  .carousel-item {
+    width: 100%; /* Largura do carrossel ocupa toda a tela */
+  }
+  .carousel-inner {
+    height: 60vh; /* Ajuste a altura conforme necessário */
+  }
+  .carousel-item img {
+    width: 100%; /* Garantir que a imagem ocupe toda a largura */
+    height: 100%; /* A altura vai acompanhar a configuração do .carousel-inner */
+    object-fit: cover; /* Faz com que a imagem cubra a área sem distorcer */
+  }
+  @media (max-width: 768px) {
+    .carousel-inner {
+      height: 50vh; /* Menor altura em telas pequenas */
+    }
+  }
   
