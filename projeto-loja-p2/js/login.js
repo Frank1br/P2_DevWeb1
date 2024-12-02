@@ -1,5 +1,6 @@
 const validEmail = "amanda@fatec.com";
 const validPassword = "frank";
+const userName = "Amanda"; // Nome do usuário associado ao email
 
 document.getElementById("loginForm").addEventListener("submit", function (e) {
   e.preventDefault();
@@ -8,7 +9,10 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
   const error = document.getElementById("loginError");
 
   if (email === validEmail && password === validPassword) {
-    window.location.href = "produto.html";
+    // Armazena o nome do usuário no localStorage
+    localStorage.setItem("userName", userName);
+    // Redireciona para a página de produtos
+    window.location.href = "index.html";
   } else {
     error.classList.remove("d-none");
   }
