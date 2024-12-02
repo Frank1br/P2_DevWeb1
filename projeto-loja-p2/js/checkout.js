@@ -32,8 +32,8 @@ function loadCart() {
     loadCart(); // Atualiza a página após o checkout
   }
 
-  function logout() {
-    window.location.href = "produto.html";
+  function goBack() {
+    window.location.href = "index.html";
   }
 
   // Carregar o carrinho ao carregar a página
