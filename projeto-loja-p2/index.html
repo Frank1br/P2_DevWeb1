@@ -54,6 +54,33 @@
           </ul>
           <hr>
           <p><strong>Total: R$ <span id="totalCarrinho">0.00</span></strong></p>
+          
+          <!-- Formulário de forma de pagamento e endereço -->
+          <h3>Escolha a forma de pagamento</h3>
+          <form id="checkout-form">
+            <label for="pagamento">Forma de Pagamento:</label>
+            <select id="pagamento" name="pagamento" class="form-select mb-3">
+              <option value="cartao">Cartão de Crédito</option>
+              <option value="boleto">Boleto Bancário</option>
+              <option value="pix">PIX</option>
+            </select>
+  
+            <h3>Endereço de entrega</h3>
+            <label for="cep">CEP:</label>
+            <input type="text" id="cep" name="cep" class="form-control mb-3" maxlength="8" placeholder="Digite o CEP" onblur="buscarEndereco()">
+            
+            <label for="rua">Rua:</label>
+            <input type="text" id="rua" name="rua" class="form-control mb-3" readonly>
+            
+            <label for="bairro">Bairro:</label>
+            <input type="text" id="bairro" name="bairro" class="form-control mb-3" readonly>
+            
+            <label for="cidade">Cidade:</label>
+            <input type="text" id="cidade" name="cidade" class="form-control mb-3" readonly>
+            
+            <label for="estado">Estado:</label>
+            <input type="text" id="estado" name="estado" class="form-control mb-3" readonly>
+          </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
