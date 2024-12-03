@@ -1,40 +1,53 @@
-// Função para carregar o carrinho
-function loadCart() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartItemsContainer = document.getElementById('cart-items');
-    const totalPriceElement = document.getElementById('total-price');
-    let totalPrice = 0;
+// Exibe os produtos no checkout
+function exibirProdutosCarrinho() {
+  const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+  const listaProdutos = document.getElementById("produtos-lista").querySelector("ul");
+  const totalPedido = document.getElementById("total-pedido");
 
-    cartItemsContainer.innerHTML = ''; // Limpar o conteúdo atual
+  let total = 0;
 
-    cart.forEach(item => {
-      const itemDiv = document.createElement('div');
-      itemDiv.classList.add('col-12', 'col-md-6', 'mt-4');
-      itemDiv.innerHTML = `
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">${item.name}</h5>
-            <p class="card-text">R$ ${item.price.toFixed(2)}</p>
-            <p class="card-text">Quantidade: ${item.quantity}</p>
-          </div>
+  carrinho.forEach(produto => {
+    const item = document.createElement("li");
+    item.classList.add("list-group-item", "d-flex", "justify-content-between");
+
+    item.innerHTML = `
+      <div class="d-flex">
+        <img src="${produto.imagem}" alt="${produto.nome}" class="produto-imagem me-3">
+        <div>
+          <strong>${produto.nome}</strong>
+          <p>${produto.descricao}</p>
         </div>
-      `;
-      cartItemsContainer.appendChild(itemDiv);
-      totalPrice += item.price * item.quantity;
-    });
+      </div>
+      <span>R$ ${produto.preco.toFixed(2)} x ${produto.quantidade}</span>
+    `;
 
-    totalPriceElement.textContent = totalPrice.toFixed(2);
-  }
+    listaProdutos.appendChild(item);
 
-  function checkout() {
-    alert('Compra finalizada!');
-    localStorage.removeItem('cart');
-    loadCart(); // Atualiza a página após o checkout
-  }
+    total += produto.preco * produto.quantidade;
+  });
 
-  function goBack() {
-    window.location.href = "index.html";
-  }
+  totalPedido.textContent = total.toFixed(2);
+}
 
-  // Carregar o carrinho ao carregar a página
-  loadCart();
+// Exibe as informações de endereço e forma de pagamento
+function exibirInformacoesPedido() {
+  const endereco = localStorage.getItem("endereco");
+  const pagamento = localStorage.getItem("pagamento");
+
+  document.getElementById("endereco-entrega").textContent = endereco || "Não informado";
+  document.getElementById("forma-pagamento").textContent = pagamento || "Não informado";
+}
+
+// Função que chama o redirecionamento para a página de produtos
+function voltarParaProdutos() {
+  window.location.href = "index.html";
+}
+
+// Função para inicializar a página de checkout
+function inicializarCheckout() {
+  exibirProdutosCarrinho();
+  exibirInformacoesPedido();
+}
+
+// Inicia o checkout
+inicializarCheckout();

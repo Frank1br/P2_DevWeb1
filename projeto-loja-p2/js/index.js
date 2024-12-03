@@ -34,8 +34,15 @@ function logout() {
 let carrinho = [];
 let total = 0;
 
+function verificarLogin() {
+  const usuarioLogado = localStorage.getItem("usuario"); // Supondo que você armazene o usuário logado no localStorage
+  if (!usuarioLogado) {
+    window.location.href = "login.html"; // Redireciona para a página de login se não estiver logado
+  }
+}
+
+// Função para adicionar um produto ao carrinho
 function adicionarAoCarrinho(nomeProduto, preco, imagem) {
-  // Verificar se o produto já está no carrinho
   const itemExistente = carrinho.find(item => item.nome === nomeProduto);
   if (itemExistente) {
     itemExistente.quantidade += 1; // Aumentar a quantidade
@@ -47,6 +54,7 @@ function adicionarAoCarrinho(nomeProduto, preco, imagem) {
   atualizarQuantidadeCarrinho();
 }
 
+// Função para atualizar a lista do carrinho
 function atualizarCarrinho() {
   const carrinhoLista = document.getElementById('carrinhoLista');
   carrinhoLista.innerHTML = ''; // Limpar lista
@@ -55,7 +63,6 @@ function atualizarCarrinho() {
     const itemCarrinho = document.createElement('li');
     itemCarrinho.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
-    // Adicionar conteúdo do item
     itemCarrinho.innerHTML = `
       <img src="${item.imagem}" alt="${item.nome}" style="width: 50px; height: 50px; object-fit: cover;" class="me-3">
       <span>${item.nome}</span>
@@ -74,6 +81,7 @@ function atualizarCarrinho() {
   document.getElementById('totalCarrinho').textContent = total.toFixed(2);
 }
 
+// Função para alterar a quantidade de um item no carrinho
 function alterarQuantidade(nomeProduto, quantidade) {
   const item = carrinho.find(item => item.nome === nomeProduto);
   if (item) {
@@ -87,6 +95,7 @@ function alterarQuantidade(nomeProduto, quantidade) {
   }
 }
 
+// Função para remover um item do carrinho
 function removerItem(nomeProduto) {
   carrinho = carrinho.filter(item => item.nome !== nomeProduto);
   total = carrinho.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
@@ -94,6 +103,7 @@ function removerItem(nomeProduto) {
   atualizarQuantidadeCarrinho();
 }
 
+// Função para finalizar a compra
 function finalizarCompra() {
   // Limpar o carrinho e exibir uma mensagem de finalização
   carrinho = [];
@@ -101,13 +111,18 @@ function finalizarCompra() {
   atualizarCarrinho();
   atualizarQuantidadeCarrinho();
   alert('Compra finalizada com sucesso!');
+  
+  // Redirecionar para a página de checkout
+  window.location.href = "checkout.html";
 }
 
+// Função para atualizar a quantidade do carrinho no botão
 function atualizarQuantidadeCarrinho() {
   const quantidadeCarrinho = carrinho.reduce((acc, item) => acc + item.quantidade, 0);
   document.getElementById('carrinhoBtn').textContent = `Carrinho (${quantidadeCarrinho})`;
 }
 
+// Função para buscar o endereço com o ViaCEP
 function buscarEndereco() {
   const cep = document.getElementById('cep').value.replace(/\D/g, ''); // Limpa caracteres não numéricos
   if (cep.length === 8) {
@@ -143,3 +158,15 @@ function limparCampos() {
   document.getElementById('cidade').value = '';
   document.getElementById('estado').value = '';
 }
+
+// Função para realizar o logout
+function logout() {
+  localStorage.removeItem("usuario"); // Remove o usuário logado do localStorage
+  window.location.href = "index.html"; // Redireciona para a página inicial
+}
+
+// Exemplo de evento de logout
+document.getElementById("logout-button").addEventListener("click", logout);
+
+// Verificar login quando a página de carrinho for carregada
+verificarLogin();
