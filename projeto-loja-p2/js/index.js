@@ -18,6 +18,9 @@ window.addEventListener("DOMContentLoaded", () => {
     // Logout functionality
     document.getElementById("logoutBtn").addEventListener("click", logout);
   }
+
+  // Restaurar o carrinho da memória local
+  restaurarCarrinho();
 });
 
 function login() {
@@ -29,17 +32,17 @@ function logout() {
   window.location.href = "index.html"; // Redirect to home page
 }
 
-// CARRINHO
-
-let carrinho = [];
-let total = 0;
-
 function verificarLogin() {
   const usuarioLogado = localStorage.getItem("usuario"); // Supondo que você armazene o usuário logado no localStorage
   if (!usuarioLogado) {
     window.location.href = "login.html"; // Redireciona para a página de login se não estiver logado
   }
 }
+
+// CARRINHO
+
+let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+let total = carrinho.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
 
 // Função para adicionar um produto ao carrinho
 function adicionarAoCarrinho(nomeProduto, preco, imagem) {
@@ -50,6 +53,18 @@ function adicionarAoCarrinho(nomeProduto, preco, imagem) {
     carrinho.push({ nome: nomeProduto, preco: preco, imagem: imagem, quantidade: 1 });
   }
   total += preco;
+  salvarCarrinho();
+  atualizarCarrinho();
+  atualizarQuantidadeCarrinho();
+}
+
+// Função para salvar o carrinho no localStorage
+function salvarCarrinho() {
+  localStorage.setItem("carrinho", JSON.stringify(carrinho));
+}
+
+// Função para restaurar o carrinho do localStorage
+function restaurarCarrinho() {
   atualizarCarrinho();
   atualizarQuantidadeCarrinho();
 }
@@ -57,6 +72,7 @@ function adicionarAoCarrinho(nomeProduto, preco, imagem) {
 // Função para atualizar a lista do carrinho
 function atualizarCarrinho() {
   const carrinhoLista = document.getElementById('carrinhoLista');
+  if (!carrinhoLista) return; // Garantir que o elemento exista antes de usar
   carrinhoLista.innerHTML = ''; // Limpar lista
 
   carrinho.forEach(item => {
@@ -90,6 +106,7 @@ function alterarQuantidade(nomeProduto, quantidade) {
       carrinho = carrinho.filter(item => item.nome !== nomeProduto); // Remover item se quantidade for 0 ou negativa
     }
     total = carrinho.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
+    salvarCarrinho();
     atualizarCarrinho();
     atualizarQuantidadeCarrinho();
   }
@@ -99,74 +116,27 @@ function alterarQuantidade(nomeProduto, quantidade) {
 function removerItem(nomeProduto) {
   carrinho = carrinho.filter(item => item.nome !== nomeProduto);
   total = carrinho.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
+  salvarCarrinho();
   atualizarCarrinho();
   atualizarQuantidadeCarrinho();
 }
 
 // Função para finalizar a compra
 function finalizarCompra() {
-  // Limpar o carrinho e exibir uma mensagem de finalização
   carrinho = [];
   total = 0;
+  salvarCarrinho();
   atualizarCarrinho();
   atualizarQuantidadeCarrinho();
   alert('Compra finalizada com sucesso!');
-  
-  // Redirecionar para a página de checkout
   window.location.href = "checkout.html";
 }
 
 // Função para atualizar a quantidade do carrinho no botão
 function atualizarQuantidadeCarrinho() {
   const quantidadeCarrinho = carrinho.reduce((acc, item) => acc + item.quantidade, 0);
-  document.getElementById('carrinhoBtn').textContent = `Carrinho (${quantidadeCarrinho})`;
-}
-
-// Função para buscar o endereço com o ViaCEP
-function buscarEndereco() {
-  const cep = document.getElementById('cep').value.replace(/\D/g, ''); // Limpa caracteres não numéricos
-  if (cep.length === 8) {
-    // Faz a requisição à API ViaCEP
-    fetch(`https://viacep.com.br/ws/${cep}/json/`)
-      .then(response => response.json())
-      .then(data => {
-        if (!data.erro) {
-          // Preenche os campos com os dados recebidos
-          document.getElementById('rua').value = data.logradouro;
-          document.getElementById('bairro').value = data.bairro;
-          document.getElementById('cidade').value = data.localidade;
-          document.getElementById('estado').value = data.uf;
-        } else {
-          alert("CEP não encontrado.");
-          limparCampos(); // Limpa os campos de endereço se o CEP não for encontrado
-        }
-      })
-      .catch(() => {
-        alert("Erro ao buscar o CEP.");
-        limparCampos(); // Limpa os campos de endereço em caso de erro
-      });
-  } else {
-    alert("Por favor, insira um CEP válido.");
-    limparCampos(); // Limpa os campos de endereço se o CEP for inválido
+  const carrinhoBtn = document.getElementById('carrinhoBtn');
+  if (carrinhoBtn) {
+    carrinhoBtn.textContent = `Carrinho (${quantidadeCarrinho})`;
   }
 }
-
-// Função para limpar os campos de endereço
-function limparCampos() {
-  document.getElementById('rua').value = '';
-  document.getElementById('bairro').value = '';
-  document.getElementById('cidade').value = '';
-  document.getElementById('estado').value = '';
-}
-
-// Função para realizar o logout
-function logout() {
-  localStorage.removeItem("usuario"); // Remove o usuário logado do localStorage
-  window.location.href = "index.html"; // Redireciona para a página inicial
-}
-
-// Exemplo de evento de logout
-document.getElementById("logout-button").addEventListener("click", logout);
-
-// Verificar login quando a página de carrinho for carregada
-verificarLogin();

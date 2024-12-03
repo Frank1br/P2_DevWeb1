@@ -5,6 +5,7 @@ function exibirProdutosCarrinho() {
   const totalPedido = document.getElementById("total-pedido");
 
   let total = 0;
+  listaProdutos.innerHTML = ""; // Garantir que a lista esteja limpa
 
   carrinho.forEach(produto => {
     const item = document.createElement("li");
@@ -15,10 +16,10 @@ function exibirProdutosCarrinho() {
         <img src="${produto.imagem}" alt="${produto.nome}" class="produto-imagem me-3">
         <div>
           <strong>${produto.nome}</strong>
-          <p>${produto.descricao}</p>
+          <p>Quantidade: ${produto.quantidade}</p>
         </div>
       </div>
-      <span>R$ ${produto.preco.toFixed(2)} x ${produto.quantidade}</span>
+      <span>R$ ${(produto.preco * produto.quantidade).toFixed(2)}</span>
     `;
 
     listaProdutos.appendChild(item);
@@ -38,16 +39,18 @@ function exibirInformacoesPedido() {
   document.getElementById("forma-pagamento").textContent = pagamento || "Não informado";
 }
 
-// Função que chama o redirecionamento para a página de produtos
-function voltarParaProdutos() {
-  window.location.href = "index.html";
-}
-
-// Função para inicializar a página de checkout
+// Inicializar a página de checkout
 function inicializarCheckout() {
   exibirProdutosCarrinho();
   exibirInformacoesPedido();
 }
 
-// Inicia o checkout
-inicializarCheckout();
+
+
+// Executar inicialização ao carregar a página
+document.addEventListener("DOMContentLoaded", inicializarCheckout);
+
+
+function voltarParaProdutos() {
+  window.location.href = "index.html"; // Redirect to login page
+}
