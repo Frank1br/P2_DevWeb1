@@ -11,17 +11,21 @@ window.addEventListener("DOMContentLoaded", () => {
       <span class="text-white">Bem-vindo, ${userName}</span>
       <button class="btn btn-danger ms-3" id="logoutBtn">Deslogar</button>
     `;
-
     navBar.appendChild(userDisplay);
-    loginButton.style.display = "none"; // Hide login button
+    loginButton.style.display = "none";
 
-    // Logout functionality
     document.getElementById("logoutBtn").addEventListener("click", logout);
   }
 
   // Restaurar o carrinho da memória local
   restaurarCarrinho();
+
+  // Atualizar o botão do carrinho
+  const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+  const carrinhoBtn = document.getElementById("carrinhoBtn");
+  carrinhoBtn.textContent = `Carrinho (${carrinho.length})`;
 });
+
 
 function login() {
   window.location.href = "login.html"; // Redirect to login page
@@ -33,11 +37,13 @@ function logout() {
 }
 
 function verificarLogin() {
-  const usuarioLogado = localStorage.getItem("usuario"); // Supondo que você armazene o usuário logado no localStorage
+  const usuarioLogado = localStorage.getItem("userName");
   if (!usuarioLogado) {
-    window.location.href = "login.html"; // Redireciona para a página de login se não estiver logado
+    alert("Você precisa estar logado para acessar esta página.");
+    window.location.href = "login.html"; // Redirecionar para a página de login
   }
 }
+
 
 // CARRINHO
 
@@ -45,18 +51,17 @@ let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
 let total = carrinho.reduce((acc, item) => acc + item.preco * item.quantidade, 0);
 
 // Função para adicionar um produto ao carrinho
-function adicionarAoCarrinho(nomeProduto, preco, imagem) {
-  const itemExistente = carrinho.find(item => item.nome === nomeProduto);
-  if (itemExistente) {
-    itemExistente.quantidade += 1; // Aumentar a quantidade
-  } else {
-    carrinho.push({ nome: nomeProduto, preco: preco, imagem: imagem, quantidade: 1 });
-  }
-  total += preco;
-  salvarCarrinho();
-  atualizarCarrinho();
-  atualizarQuantidadeCarrinho();
+function adicionarAoCarrinho(nome, preco, imagem) {
+  const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+  carrinho.push({ nome, preco, imagem });
+
+  localStorage.setItem("carrinho", JSON.stringify(carrinho));
+  restaurarCarrinho();
+
+  const carrinhoBtn = document.getElementById("carrinhoBtn");
+  carrinhoBtn.textContent = `Carrinho (${carrinho.length})`; // Atualiza o contador
 }
+
 
 // Função para salvar o carrinho no localStorage
 function salvarCarrinho() {
@@ -65,9 +70,29 @@ function salvarCarrinho() {
 
 // Função para restaurar o carrinho do localStorage
 function restaurarCarrinho() {
-  atualizarCarrinho();
-  atualizarQuantidadeCarrinho();
+  const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+  const carrinhoLista = document.getElementById("carrinhoLista");
+  const totalCarrinho = document.getElementById("totalCarrinho");
+
+  carrinhoLista.innerHTML = ""; // Limpa a lista para evitar duplicação
+  let total = 0;
+
+  carrinho.forEach(item => {
+    const li = document.createElement("li");
+    li.classList.add("list-group-item");
+    li.innerHTML = `
+      <div class="d-flex justify-content-between">
+        <span>${item.nome}</span>
+        <span>R$ ${item.preco.toFixed(2)}</span>
+      </div>
+    `;
+    carrinhoLista.appendChild(li);
+    total += item.preco;
+  });
+
+  totalCarrinho.textContent = total.toFixed(2);
 }
+
 
 // Função para atualizar a lista do carrinho
 function atualizarCarrinho() {
@@ -123,14 +148,19 @@ function removerItem(nomeProduto) {
 
 // Função para finalizar a compra
 function finalizarCompra() {
-  carrinho = [];
-  total = 0;
-  salvarCarrinho();
-  atualizarCarrinho();
-  atualizarQuantidadeCarrinho();
-  alert('Compra finalizada com sucesso!');
-  window.location.href = "checkout.html";
+  const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+  if (carrinho.length === 0) {
+    alert("Seu carrinho está vazio.");
+    return;
+  }
+
+  alert("Compra finalizada com sucesso! Obrigado pela preferência.");
+  localStorage.removeItem("carrinho"); // Limpa o carrinho
+  restaurarCarrinho(); // Atualiza o modal do carrinho
+  const carrinhoBtn = document.getElementById("carrinhoBtn");
+  carrinhoBtn.textContent = "Carrinho (0)"; // Reseta o contador
 }
+
 
 // Função para atualizar a quantidade do carrinho no botão
 function atualizarQuantidadeCarrinho() {
@@ -141,37 +171,53 @@ function atualizarQuantidadeCarrinho() {
   }
 }
 
-function buscarEndereco() {
-  const cep = document.getElementById('cep').value.replace(/\D/g, ''); // Limpa caracteres não numéricos
+async function buscarEndereco() {
+  const cep = document.getElementById("cep").value;
   if (cep.length === 8) {
-    // Faz a requisição à API ViaCEP
-    fetch(`https://viacep.com.br/ws/${cep}/json/`)
-      .then(response => response.json())
-      .then(data => {
-        if (!data.erro) {
-          // Preenche os campos com os dados recebidos
-          document.getElementById('rua').value = data.logradouro;
-          document.getElementById('bairro').value = data.bairro;
-          document.getElementById('cidade').value = data.localidade;
-          document.getElementById('estado').value = data.uf;
-        } else {
-          alert("CEP não encontrado.");
-          limparCampos(); // Limpa os campos de endereço se o CEP não for encontrado
-        }
-      })
-      .catch(() => {
-        alert("Erro ao buscar o CEP.");
-        limparCampos(); // Limpa os campos de endereço em caso de erro
-      });
-  } else {
-    alert("Por favor, insira um CEP válido.");
-    limparCampos(); // Limpa os campos de endereço se o CEP for inválido
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      if (!response.ok) throw new Error("Erro ao buscar endereço");
+      const data = await response.json();
+
+      document.getElementById("rua").value = data.logradouro || "";
+      document.getElementById("bairro").value = data.bairro || "";
+      document.getElementById("cidade").value = data.localidade || "";
+      document.getElementById("estado").value = data.uf || "";
+    } catch (error) {
+      alert("Erro ao buscar endereço. Verifique o CEP digitado.");
+    }
   }
 }
+
 // Função para limpar os campos de endereço
 function limparCampos() {
   document.getElementById('rua').value = '';
   document.getElementById('bairro').value = '';
   document.getElementById('cidade').value = '';
   document.getElementById('estado').value = '';
+}
+
+document.querySelector("form").addEventListener("submit", (e) => {
+  const nome = document.getElementById("nome").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const mensagem = document.getElementById("mensagem").value.trim();
+
+  if (!nome || !email || !mensagem) {
+    alert("Por favor, preencha todos os campos.");
+    e.preventDefault(); // Evita o envio do formulário
+  } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+    alert("Por favor, insira um e-mail válido.");
+    e.preventDefault();
+  }
+});
+
+function irParaCheckout() {
+  const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+  if (carrinho.length === 0) {
+    alert("Seu carrinho está vazio. Adicione itens antes de continuar.");
+    return;
+  }
+
+  // Redireciona para a página de checkout
+  window.location.href = "checkout.html";
 }

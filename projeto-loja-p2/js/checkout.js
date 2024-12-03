@@ -1,56 +1,38 @@
-// Exibe os produtos no checkout
-function exibirProdutosCarrinho() {
+window.addEventListener("DOMContentLoaded", () => {
   const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
-  const listaProdutos = document.getElementById("produtos-lista").querySelector("ul");
-  const totalPedido = document.getElementById("total-pedido");
+  const checkoutLista = document.getElementById("checkoutLista");
+  const checkoutTotal = document.getElementById("checkoutTotal");
+
+  if (carrinho.length === 0) {
+    checkoutLista.innerHTML = `<li class="list-group-item">Seu carrinho está vazio.</li>`;
+    return;
+  }
 
   let total = 0;
-  listaProdutos.innerHTML = ""; // Garantir que a lista esteja limpa
 
-  carrinho.forEach(produto => {
-    const item = document.createElement("li");
-    item.classList.add("list-group-item", "d-flex", "justify-content-between");
-
-    item.innerHTML = `
-      <div class="d-flex">
-        <img src="${produto.imagem}" alt="${produto.nome}" class="produto-imagem me-3">
+  carrinho.forEach(item => {
+    const li = document.createElement("li");
+    li.classList.add("list-group-item");
+    li.innerHTML = `
+      <div class="d-flex justify-content-between">
         <div>
-          <strong>${produto.nome}</strong>
-          <p>Quantidade: ${produto.quantidade}</p>
+          <strong>${item.nome}</strong>
+          <br>
+          <small>Quantidade: ${item.quantidade || 1}</small>
         </div>
+        <span>R$ ${(item.preco * (item.quantidade || 1)).toFixed(2)}</span>
       </div>
-      <span>R$ ${(produto.preco * produto.quantidade).toFixed(2)}</span>
     `;
-
-    listaProdutos.appendChild(item);
-
-    total += produto.preco * produto.quantidade;
+    checkoutLista.appendChild(li);
+    total += item.preco * (item.quantidade || 1);
   });
 
-  totalPedido.textContent = total.toFixed(2);
-}
+  checkoutTotal.textContent = `R$ ${total.toFixed(2)}`;
+});
 
-// Exibe as informações de endereço e forma de pagamento
-function exibirInformacoesPedido() {
-  const endereco = localStorage.getItem("endereco");
-  const pagamento = localStorage.getItem("pagamento");
-
-  document.getElementById("endereco-entrega").textContent = endereco || "Não informado";
-  document.getElementById("forma-pagamento").textContent = pagamento || "Não informado";
-}
-
-// Inicializar a página de checkout
-function inicializarCheckout() {
-  exibirProdutosCarrinho();
-  exibirInformacoesPedido();
-}
-
-
-
-// Executar inicialização ao carregar a página
-document.addEventListener("DOMContentLoaded", inicializarCheckout);
-
-
-function voltarParaProdutos() {
-  window.location.href = "index.html"; // Redirect to login page
-}
+// Botão para finalizar a compra
+document.getElementById("finalizarCompra").addEventListener("click", () => {
+  alert("Compra finalizada com sucesso! Obrigado pela preferência.");
+  localStorage.removeItem("carrinho"); // Limpa o carrinho
+  window.location.href = "index.html"; // Redireciona para a página inicial
+});
