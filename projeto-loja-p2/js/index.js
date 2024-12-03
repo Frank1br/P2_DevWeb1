@@ -140,3 +140,38 @@ function atualizarQuantidadeCarrinho() {
     carrinhoBtn.textContent = `Carrinho (${quantidadeCarrinho})`;
   }
 }
+
+function buscarEndereco() {
+  const cep = document.getElementById('cep').value.replace(/\D/g, ''); // Limpa caracteres não numéricos
+  if (cep.length === 8) {
+    // Faz a requisição à API ViaCEP
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      .then(response => response.json())
+      .then(data => {
+        if (!data.erro) {
+          // Preenche os campos com os dados recebidos
+          document.getElementById('rua').value = data.logradouro;
+          document.getElementById('bairro').value = data.bairro;
+          document.getElementById('cidade').value = data.localidade;
+          document.getElementById('estado').value = data.uf;
+        } else {
+          alert("CEP não encontrado.");
+          limparCampos(); // Limpa os campos de endereço se o CEP não for encontrado
+        }
+      })
+      .catch(() => {
+        alert("Erro ao buscar o CEP.");
+        limparCampos(); // Limpa os campos de endereço em caso de erro
+      });
+  } else {
+    alert("Por favor, insira um CEP válido.");
+    limparCampos(); // Limpa os campos de endereço se o CEP for inválido
+  }
+}
+// Função para limpar os campos de endereço
+function limparCampos() {
+  document.getElementById('rua').value = '';
+  document.getElementById('bairro').value = '';
+  document.getElementById('cidade').value = '';
+  document.getElementById('estado').value = '';
+}
