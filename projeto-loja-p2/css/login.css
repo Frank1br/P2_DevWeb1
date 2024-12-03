@@ -1,43 +1,63 @@
-body {
-    height: 100vh;
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-  .landing-page {
-    display: flex;
-    flex-direction: row;
-    height: 100vh;
-    overflow: hidden;
-  }
-  .image-section {
-    width: 50%;
-    background: url('https://i.pinimg.com/736x/45/7b/40/457b40ee8a7a4a1612cb438ffb883efc.jpg') no-repeat center center;
-    background-size: cover;
-  }
-  .form-section {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f8f9fa;
-  }
-  .form-container {
-    width: 80%;
-    max-width: 400px;
-    padding: 20px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    background-color: white;
-  }
-  .form-container h2 {
-    margin-bottom: 20px;
-    color: #333;
-  }
-  .form-container .btn-primary {
-    background-color: #007bff;
-    border: none;
-    padding: 10px;
-  }
-  .form-container .btn-primary:hover {
-    background-color: #0056b3;
-  }
+/* Adicionando um estilo básico para a página */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.landing-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Estilo do conteúdo da página */
+.page-content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Estilo para a seção da imagem */
+.image-section {
+  flex: 1; /* Ocupa toda a largura da tela */
+  height: 100%;
+  position: relative;
+  overflow: hidden; /* Garante que a imagem não ultrapasse os limites */
+}
+
+.image-section img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Faz a imagem cobrir todo o espaço sem distorção */
+}
+
+/* Estilo para a seção do formulário */
+.form-section {
+  flex: 1; /* Ocupa a outra metade da tela */
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Adicionando um espaçamento e estilo para os inputs e botões */
+input.form-control {
+  margin-bottom: 15px;
+}
+
+button {
+  margin-top: 10px;
+}
+
+/* Estilo de alerta de erro */
+#loginError {
+  display: none;
+}
