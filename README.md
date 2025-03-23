@@ -1,0 +1,1 @@
+Projeto de desenvolvimento de um site para uma confeitaria, com funcionalidades de login de usuários, carrinho de compras e finalização de vendas online. O site oferece uma interface intuitiva e segura para a compra de produtos, permitindo aos usuários adicionar itens ao carrinho e realizar o pagamento de forma simples.
